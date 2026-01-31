@@ -16,56 +16,77 @@
             align-items: center; justify-content: center;
         }
 
-        /* --- PRELOADER (ЭКРАН ЗАГРУЗКИ) --- */
+        /* --- ПРЕЛОАДЕР (ЗАГРУЗКА) --- */
         #preloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 99999; /* Поверх всего */
+            background: #000; z-index: 100000;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            transition: opacity 1s ease-out; /* Плавное исчезновение */
+            transition: opacity 1s ease-out;
         }
-        
         .loader-text {
-            font-family: 'Oswald', sans-serif; 
-            color: #39ff14; 
-            letter-spacing: 3px; 
-            text-transform: uppercase;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            animation: blink 1.5s infinite;
+            font-family: 'Oswald', sans-serif; color: #39ff14; 
+            letter-spacing: 3px; text-transform: uppercase; font-size: 1.2rem;
+            margin-bottom: 20px; animation: blink 1.5s infinite;
         }
-
-        .progress-container {
-            width: 300px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
+        .progress-container { width: 300px; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; }
         .progress-bar {
-            position: absolute; left: 0; top: 0;
-            height: 100%; width: 50%;
-            background: #39ff14;
-            box-shadow: 0 0 15px #39ff14;
+            position: absolute; left: 0; top: 0; height: 100%; width: 50%;
+            background: #39ff14; box-shadow: 0 0 15px #39ff14;
             animation: loading-bar 1s infinite ease-in-out;
         }
+        @keyframes loading-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        @keyframes loading-bar {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(250%); }
+        /* --- ИНТРО ЭКРАН (О СЕБЕ) --- */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* Затемнение фона */
+            backdrop-filter: blur(10px);
+            z-index: 9000; /* Под прелоадером, но над контентом */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 1; transition: opacity 0.8s ease, transform 0.8s ease;
+            text-align: center; padding: 20px;
         }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        
+        .intro-box {
+            max-width: 700px;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            background: rgba(20, 20, 20, 0.6);
+            padding: 40px; border-radius: 20px;
+            box-shadow: 0 0 50px rgba(57, 255, 20, 0.1);
+            transform: scale(1); transition: transform 0.5s;
+        }
+        .intro-box:hover { border-color: rgba(57, 255, 20, 0.6); }
+
+        .intro-title {
+            font-family: 'Oswald', sans-serif; font-size: 3rem; color: #fff;
+            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .intro-title span { color: #39ff14; }
+        
+        .intro-text {
+            font-size: 1.1rem; line-height: 1.6; color: #ddd; margin-bottom: 40px;
+        }
+
+        .enter-btn {
+            background: transparent; color: #39ff14;
+            border: 2px solid #39ff14; padding: 15px 40px;
+            font-family: 'Oswald', sans-serif; font-size: 1.2rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            cursor: pointer; transition: 0.3s;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+        }
+        .enter-btn:hover {
+            background: #39ff14; color: #000;
+            box-shadow: 0 0 40px rgba(57, 255, 20, 0.6);
+            transform: scale(1.05);
         }
 
         /* --- ВИДЕО ФОН --- */
         .video-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: -1;
-            filter: brightness(0.4); 
+            object-fit: cover; z-index: -1; filter: brightness(0.4); 
         }
         .noise-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -73,70 +94,91 @@
             opacity: 0.05; pointer-events: none; z-index: -1;
         }
 
-        /* --- ЛОГОТИП --- */
-        .logo-container {
-            text-align: center; margin-bottom: 60px;
-            animation: fadeInDown 1s ease;
+        /* --- ОСНОВНОЙ КОНТЕНТ (СКРЫТ ПО УМОЛЧАНИЮ) --- */
+        #main-content {
+            opacity: 0; pointer-events: none; /* Неактивен, пока не нажмут кнопку */
+            transition: opacity 1s ease 0.5s; /* Появится с задержкой */
+            display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;
         }
+        
+        /* Когда класс active добавлен, контент появляется */
+        #main-content.active { opacity: 1; pointer-events: auto; }
+
+        .logo-container { text-align: center; margin-bottom: 50px; }
         .main-title {
             font-family: 'Oswald', sans-serif; font-size: 4rem;
             text-transform: uppercase; letter-spacing: 5px;
             margin: 0; text-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
         }
         .subtitle {
-            font-size: 1rem; color: #aaa; letter-spacing: 4px; text-transform: uppercase;
-            margin-top: 10px;
+            font-size: 1rem; color: #aaa; letter-spacing: 4px; text-transform: uppercase; margin-top: 10px;
         }
         .highlight { color: #39ff14; }
 
         /* --- НАВИГАЦИЯ --- */
         .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 30px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
             width: 80%; max-width: 1200px;
-            animation: fadeInUp 1s ease 0.3s forwards; opacity: 0;
         }
 
         .nav-card {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px 20px;
-            text-align: center;
-            text-decoration: none;
-            color: #fff;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; overflow: hidden;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 40px 20px; text-align: center;
+            text-decoration: none; color: #fff;
+            transition: all 0.4s; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
         }
-
         .nav-card:hover {
-            transform: translateY(-10px);
-            background: rgba(57, 255, 20, 0.05);
-            border-color: #39ff14;
-            box-shadow: 0 10px 40px rgba(57, 255, 20, 0.15);
+            transform: translateY(-10px); background: rgba(57, 255, 20, 0.05);
+            border-color: #39ff14; box-shadow: 0 10px 40px rgba(57, 255, 20, 0.15);
         }
 
-        .card-icon { font-size: 2.5rem; margin-bottom: 20px; color: #ccc; transition: 0.3s; }
-        .nav-card:hover .card-icon { color: #39ff14; transform: scale(1.1); }
+        /* --- ГЕОМЕТРИЧЕСКИЕ ИКОНКИ (CSS) --- */
+        .geo-icon {
+            width: 60px; height: 60px; margin-bottom: 20px;
+            position: relative; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .nav-card:hover .geo-icon { transform: scale(1.1); }
 
+        /* 1. ВИДЕО (Треугольник в круге) */
+        .icon-video { border: 2px solid #fff; border-radius: 50%; }
+        .icon-video::after {
+            content: ''; width: 0; height: 0;
+            border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+            border-left: 18px solid #fff; margin-left: 5px;
+        }
+        .nav-card:hover .icon-video { border-color: #39ff14; box-shadow: 0 0 15px rgba(57,255,20,0.4); }
+        .nav-card:hover .icon-video::after { border-left-color: #39ff14; }
+
+        /* 2. МУЗЫКА (Эквалайзер) */
+        .icon-music { gap: 4px; align-items: flex-end; }
+        .bar { width: 8px; background: #fff; border-radius: 2px; transition: 0.3s; }
+        .bar:nth-child(1) { height: 40%; } .bar:nth-child(2) { height: 80%; } .bar:nth-child(3) { height: 50%; } .bar:nth-child(4) { height: 70%; }
+        .nav-card:hover .bar { background: #39ff14; box-shadow: 0 0 10px #39ff14; animation: eq-bounce 0.5s infinite alternate; }
+        @keyframes eq-bounce { from { height: 20%; } to { height: 100%; } }
+        .bar:nth-child(1) { animation-delay: 0s; } .bar:nth-child(2) { animation-delay: 0.1s; } .bar:nth-child(3) { animation-delay: 0.2s; } .bar:nth-child(4) { animation-delay: 0.3s; }
+
+        /* 3. ФОТО (Объектив) */
+        .icon-photo { border: 2px solid #fff; border-radius: 12px; } /* Квадрат */
+        .icon-photo::before { content: ''; position: absolute; width: 30px; height: 30px; border: 2px solid #fff; border-radius: 50%; } /* Круг */
+        .icon-photo::after { content: ''; position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; top: 10px; right: 10px; } /* Вспышка */
+        .nav-card:hover .icon-photo { border-color: #39ff14; box-shadow: 0 0 15px rgba(57,255,20,0.4); }
+        .nav-card:hover .icon-photo::before { border-color: #39ff14; }
+        .nav-card:hover .icon-photo::after { background: #39ff14; }
+
+        /* --- ТЕКСТ КАРТОЧЕК --- */
         .card-title {
             font-family: 'Oswald', sans-serif; font-size: 1.5rem;
-            text-transform: uppercase; letter-spacing: 2px;
-            margin-bottom: 10px;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;
         }
         .card-desc { font-size: 0.9rem; color: #888; }
 
-        /* --- ФУТЕР --- */
         .footer {
             position: absolute; bottom: 30px; width: 100%;
-            text-align: center; color: #555; font-size: 0.8rem;
-            letter-spacing: 1px;
+            text-align: center; color: #555; font-size: 0.8rem; letter-spacing: 1px;
         }
-
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
     </style>
 </head>
@@ -144,8 +186,18 @@
 
     <div id="preloader">
         <div class="loader-text">ЗАГРУЗКА ИНТЕРФЕЙСА...</div>
-        <div class="progress-container">
-            <div class="progress-bar"></div>
+        <div class="progress-container"><div class="progress-bar"></div></div>
+    </div>
+
+    <div id="intro-screen">
+        <div class="intro-box">
+            <h1 class="intro-title">Roman <span>AI Creator</span></h1>
+            <p class="intro-text">
+                Добро пожаловать в мою цифровую лабораторию. <br>
+                Я создаю уникальный аудио-визуальный контент с помощью нейросетей. <br><br>
+                Видео продакшн • Саунд-дизайн • Нейро-арт
+            </p>
+            <button class="enter-btn" onclick="enterSite()">Перейти к примерам работ</button>
         </div>
     </div>
 
@@ -154,69 +206,78 @@
     </video>
     <div class="noise-overlay"></div>
 
-    <div class="logo-container">
-        <h1 class="main-title">ART <span class="highlight">HOLIDAYS</span></h1>
-        <div class="subtitle">Roman AI Creator & Visual Artist</div>
-    </div>
+    <div id="main-content">
+        <div class="logo-container">
+            <h1 class="main-title">ART <span class="highlight">HOLIDAYS</span></h1>
+            <div class="subtitle">Roman AI Creator & Visual Artist</div>
+        </div>
 
-    <div class="nav-grid">
-        <a href="videos.html" class="nav-card">
-            <div class="card-icon">🎬</div>
-            <div class="card-title">Production</div>
-            <div class="card-desc">Реклама, Клипы, Шоурилы</div>
-        </a>
-        <a href="music.html" class="nav-card">
-            <div class="card-icon">🎧</div>
-            <div class="card-title">Music Lab</div>
-            <div class="card-desc">Электронная музыка и саунд-дизайн</div>
-        </a>
-        <a href="photos.html" class="nav-card">
-            <div class="card-icon">📸</div>
-            <div class="card-title">Neuro Art</div>
-            <div class="card-desc">Галерея AI генераций</div>
-        </a>
-    </div>
+        <div class="nav-grid">
+            <a href="videos.html" class="nav-card">
+                <div class="geo-icon icon-video"></div>
+                <div class="card-title">Production</div>
+                <div class="card-desc">Реклама, Клипы, Шоурилы</div>
+            </a>
+            <a href="music.html" class="nav-card">
+                <div class="geo-icon icon-music">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+                <div class="card-title">Music Lab</div>
+                <div class="card-desc">Электронная музыка и саунд-дизайн</div>
+            </a>
+            <a href="photos.html" class="nav-card">
+                <div class="geo-icon icon-photo"></div>
+                <div class="card-title">Neuro Art</div>
+                <div class="card-desc">Галерея AI генераций</div>
+            </a>
+        </div>
 
-    <div class="footer">EST. 2024 • DESIGNED BY ROMAN AI</div>
+        <div class="footer">EST. 2024 • DESIGNED BY ROMAN AI</div>
+    </div>
 
     <script>
         // --- ЛОГИКА ЗАГРУЗЧИКА ---
         const video = document.getElementById('bg-video');
         const preloader = document.getElementById('preloader');
 
-        // Функция скрытия загрузчика
         function hidePreloader() {
             preloader.style.opacity = '0';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 1000); // Ждем пока пройдет анимация прозрачности (1с)
+            setTimeout(() => { preloader.style.display = 'none'; }, 1000);
         }
 
-        // 1. Если видео уже готово (в кэше браузера)
-        if (video.readyState >= 3) {
-            hidePreloader();
-        } 
-        // 2. Иначе ждем события загрузки
+        if (video.readyState >= 3) { hidePreloader(); } 
         else {
             video.addEventListener('canplaythrough', hidePreloader);
-            video.addEventListener('loadeddata', hidePreloader);
+            setTimeout(hidePreloader, 4000);
         }
 
-        // 3. СТРАХОВКА: Если видео сломалось или грузится вечность
-        // Через 4 секунды убираем загрузчик принудительно
-        setTimeout(hidePreloader, 4000);
+        // --- ЛОГИКА ВХОДА НА САЙТ ---
+        function enterSite() {
+            const intro = document.getElementById('intro-screen');
+            const main = document.getElementById('main-content');
+            
+            // 1. Интро уезжает вверх и исчезает
+            intro.style.opacity = '0';
+            intro.style.transform = 'scale(1.1)'; // Немного увеличим при исчезновении
+            intro.style.pointerEvents = 'none'; // Чтобы не мешало кликать
 
-        // --- МОБИЛЬНАЯ ПРОВЕРКА ---
+            // 2. Появляется основной контент
+            main.classList.add('active');
+            
+            // 3. Через секунду удаляем интро из потока (не обязательно, но полезно)
+            setTimeout(() => { intro.style.display = 'none'; }, 1000);
+        }
+
+        // --- МОБИЛЬНАЯ ПРОВЕРКА (ПРОЗРАЧНАЯ) ---
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             const mobileAlert = document.createElement('div');
-            // Стили остаются те же (черный фон на весь экран)
-            mobileAlert.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;";
+            // background теперь полупрозрачный, чтобы видно было видео!
+            mobileAlert.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(5px);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;";
             
-            // ЗДЕСЬ МЕНЯЕМ ТЕКСТ:
             mobileAlert.innerHTML = `
-                <h2 style="color:#39ff14;font-family:sans-serif; text-transform:uppercase; letter-spacing:2px;">ОБНАРУЖЕНА МОБИЛЬНАЯ ВЕРСИЯ</h2>
-                <p style="color:#888; font-family:sans-serif; margin-bottom: 20px;">Сайт оптимизирован! Для лучшей навигации, мы перенаправляем вас на мобильную версию сайта</p>
-                <a href="mobile.html" style="background:#39ff14;color:#000;text-decoration:none;padding:15px 30px;border-radius:30px;font-weight:bold;font-family:sans-serif;margin-top:20px;">ПЕРЕЙТИ</a>
+                <h2 style="color:#39ff14;font-family:sans-serif; text-transform:uppercase; letter-spacing:2px; margin-bottom:10px;">МОБИЛЬНАЯ ВЕРСИЯ</h2>
+                <p style="color:#ddd; font-family:sans-serif; margin-bottom: 30px; line-height:1.5;">Сайт оптимизирован для телефона.<br>Видео-фон активен.</p>
+                <a href="mobile.html" style="background:#39ff14;color:#000;text-decoration:none;padding:15px 40px;border-radius:30px;font-weight:bold;font-family:sans-serif; text-transform:uppercase; box-shadow: 0 0 20px rgba(57,255,20,0.4);">ПЕРЕЙТИ</a>
             `;
             document.body.appendChild(mobileAlert);
         }
