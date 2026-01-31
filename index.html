@@ -209,10 +209,14 @@
         // --- МОБИЛЬНАЯ ПРОВЕРКА ---
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             const mobileAlert = document.createElement('div');
+            // Стили остаются те же (черный фон на весь экран)
             mobileAlert.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;";
+            
+            // ЗДЕСЬ МЕНЯЕМ ТЕКСТ:
             mobileAlert.innerHTML = `
-                <h2 style="color:#39ff14;font-family:sans-serif;">MOBILE DETECTED</h2>
-                <a href="mobile.html" style="background:#39ff14;color:#000;text-decoration:none;padding:15px 30px;border-radius:30px;font-weight:bold;font-family:sans-serif;margin-top:20px;">GO TO MOBILE VERSION</a>
+                <h2 style="color:#39ff14;font-family:sans-serif; text-transform:uppercase; letter-spacing:2px;">ОБНАРУЖЕНА МОБИЛЬНАЯ ВЕРСИЯ</h2>
+                <p style="color:#888; font-family:sans-serif; margin-bottom: 20px;">Сайт оптимизирован! Для лучшей навигации, мы перенаправляем вас на мобильную версию сайта</p>
+                <a href="mobile.html" style="background:#39ff14;color:#000;text-decoration:none;padding:15px 30px;border-radius:30px;font-weight:bold;font-family:sans-serif;margin-top:20px;">ПЕРЕЙТИ</a>
             `;
             document.body.appendChild(mobileAlert);
         }
