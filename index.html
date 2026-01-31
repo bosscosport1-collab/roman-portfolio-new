@@ -268,16 +268,74 @@
             setTimeout(() => { intro.style.display = 'none'; }, 1000);
         }
 
-        // --- МОБИЛЬНАЯ ПРОВЕРКА (ПРОЗРАЧНАЯ) ---
+        // --- МОБИЛЬНАЯ ПРОВЕРКА (ОБНОВЛЕННАЯ) ---
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Скрываем стандартное интро ПК версии, чтобы не мешало
+            document.getElementById('intro-screen').style.display = 'none';
+
             const mobileAlert = document.createElement('div');
-            // background теперь полупрозрачный, чтобы видно было видео!
-            mobileAlert.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(5px);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;";
             
+            // СТИЛИ БЛОКА (Полупрозрачный фон + Центровка Flexbox)
+            mobileAlert.style.cssText = `
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.85); /* Прозрачность чтобы видеть видео */
+                backdrop-filter: blur(8px);
+                z-index: 999999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+                text-align: center;
+            `;
+            
+            // ВНУТРЕННИЙ HTML (Текст как на ПК)
             mobileAlert.innerHTML = `
-                <h2 style="color:#39ff14;font-family:sans-serif; text-transform:uppercase; letter-spacing:2px; margin-bottom:10px;">МОБИЛЬНАЯ ВЕРСИЯ</h2>
-                <p style="color:#ddd; font-family:sans-serif; margin-bottom: 30px; line-height:1.5;">Сайт оптимизирован для телефона.<br>Видео-фон активен.</p>
-                <a href="mobile.html" style="background:#39ff14;color:#000;text-decoration:none;padding:15px 40px;border-radius:30px;font-weight:bold;font-family:sans-serif; text-transform:uppercase; box-shadow: 0 0 20px rgba(57,255,20,0.4);">ПЕРЕЙТИ</a>
+                <div style="max-width: 500px; width: 100%;">
+                    
+                    <h1 style="
+                        font-family: 'Oswald', sans-serif; 
+                        font-size: 2.2rem; 
+                        color: #fff; 
+                        text-transform: uppercase; 
+                        letter-spacing: 2px; 
+                        margin: 0 0 20px 0;
+                        line-height: 1.2;
+                    ">
+                        Roman <span style="color: #39ff14;">AI Creator</span>
+                    </h1>
+
+                    <p style="
+                        font-family: 'Manrope', sans-serif; 
+                        font-size: 1rem; 
+                        line-height: 1.6; 
+                        color: #ddd; 
+                        margin: 0 0 40px 0;
+                    ">
+                        Добро пожаловать в мою цифровую лабораторию. <br>
+                        Я создаю уникальный аудио-визуальный контент с помощью нейросетей. <br><br>
+                        <span style="color: #888; font-size: 0.9rem;">Видео продакшн • Саунд-дизайн • Нейро-арт</span>
+                    </p>
+
+                    <a href="mobile.html" style="
+                        display: inline-block;
+                        background: transparent; 
+                        color: #39ff14;
+                        border: 2px solid #39ff14; 
+                        padding: 15px 25px;
+                        font-family: 'Oswald', sans-serif; 
+                        font-size: 1rem;
+                        text-transform: uppercase; 
+                        letter-spacing: 2px;
+                        text-decoration: none;
+                        cursor: pointer;
+                        box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+                        transition: 0.3s;
+                    ">ПЕРЕЙТИ К ПРИМЕРАМ РАБОТ</a>
+                </div>
             `;
             document.body.appendChild(mobileAlert);
         }
