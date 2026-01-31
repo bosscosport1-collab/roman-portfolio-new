@@ -20,10 +20,10 @@
         /* --- ФОН --- */
         #canvas1 { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         
-        /* --- ШАПКА (STICKY) --- */
+        /* --- ШАПКА --- */
         .header {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(26, 26, 26, 0.85); /* Полупрозрачный фон */
+            background: rgba(26, 26, 26, 0.85);
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 15px 20px;
@@ -33,9 +33,16 @@
 
         .logo { font-family: 'Oswald', sans-serif; font-size: 1.2rem; color: #fff; letter-spacing: 1px; text-transform: uppercase; }
         .logo span { color: #39ff14; }
+        
+        /* ЭФФЕКТ МАТРИЦЫ */
         .subtitle { font-size: 0.6rem; color: #888; letter-spacing: 2px; text-transform: uppercase; text-align: right; }
+        .subtitle span { display: inline-block; animation: matrix-blink 2s infinite; }
+        @keyframes matrix-blink {
+            0%, 95%, 100% { color: #888; text-shadow: none; }
+            98% { color: #39ff14; text-shadow: 0 0 10px #39ff14; }
+        }
 
-        /* --- ЗАГОЛОВКИ РАЗДЕЛОВ --- */
+        /* --- ЗАГОЛОВКИ --- */
         .section-title {
             font-family: 'Oswald', sans-serif; font-size: 1.2rem; color: #fff;
             margin: 40px 20px 20px 20px;
@@ -45,85 +52,67 @@
         .section-title span { color: #39ff14; }
         .section-title::before { content: ''; width: 4px; height: 20px; background: #39ff14; box-shadow: 0 0 10px #39ff14; display: block; }
 
-        /* --- ВИДЕО КАРТОЧКИ --- */
-        .video-grid {
-            padding: 0 20px;
-            display: flex; flex-direction: column; gap: 20px;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; overflow: hidden;
-        }
+        /* --- ВИДЕО --- */
+        .video-grid { padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden; }
         video { width: 100%; display: block; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .card-content { padding: 12px 15px; }
         .card-title { font-weight: 700; color: #fff; font-size: 1rem; margin-bottom: 4px; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
         .card-tag { display: inline-block; background: #39ff14; color: #000; font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-top: 5px; }
 
-        /* --- НЕЙРО ГАЛЕРЕЯ (СВАЙПЕР) --- */
-        .gallery-wrapper {
-            display: flex; gap: 15px; padding: 10px 20px 30px 20px;
-            overflow-x: auto; scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-        }
+        /* --- ГАЛЕРЕЯ --- */
+        .gallery-wrapper { display: flex; gap: 15px; padding: 10px 20px 30px 20px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .gallery-wrapper::-webkit-scrollbar { display: none; }
-        
-        .gallery-item {
-            flex: 0 0 auto; width: 260px; height: 380px;
-            background: #111; border-radius: 12px;
-            scroll-snap-align: center; position: relative; overflow: hidden;
-            border: 1px solid rgba(57, 255, 20, 0.2);
-        }
+        .gallery-item { flex: 0 0 auto; width: 260px; height: 380px; background: #111; border-radius: 12px; scroll-snap-align: center; position: relative; overflow: hidden; border: 1px solid rgba(57, 255, 20, 0.2); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         .gallery-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #000, transparent); padding: 15px; }
         .gallery-tag { color: #39ff14; font-family: 'Oswald', sans-serif; font-size: 0.9rem; text-transform: uppercase; }
 
-        /* --- МУЗЫКАЛЬНЫЕ КНОПКИ --- */
+        /* --- МУЗЫКА --- */
         .music-section { padding: 0 20px; margin-bottom: 30px; }
-        .music-group-title {
-            font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px;
-            margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 20px;
-        }
+        .music-group-title { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 20px; }
 
         .track-btn {
-            background: #39ff14; color: #000;
+            background: #39ff14; 
             margin-bottom: 12px;
             padding: 0 15px;
-            height: 55px; /* Фиксированная высота */
+            height: 55px;
             display: flex; align-items: center; justify-content: space-between;
             font-weight: bold; font-family: 'Manrope', sans-serif; text-transform: uppercase;
             font-size: 0.85rem; border: none; outline: none;
             position: relative; overflow: hidden;
             transition: all 0.2s;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 8px; /* Единый стиль */
+            
+            /* Цвет текста по умолчанию */
+            color: #000;
         }
         .track-btn:active { transform: scale(0.98); }
-        
-        /* Стили формы кнопок */
-        .style-rect { border-radius: 8px; } /* На заказ */
-        .style-oval { border-radius: 50px; } /* Мои */
 
         /* Активный трек */
-        .track-btn.active {
-            background: #fff; color: #000;
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        .track-btn.active { background: #fff; color: #000; box-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
+
+        .btn-left { display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden; }
+        
+        /* --- ЭФФЕКТ ВДАВЛЕННОСТИ (Letterpress) --- */
+        .play-icon { 
+            font-size: 1.1rem; 
+            min-width: 20px; 
+            
+            /* Полупрозрачный черный для глубины */
+            color: rgba(0, 0, 0, 0.65); 
+            
+            /* Белый блик снизу справа создает эффект объема */
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5); 
         }
 
-        /* Внутренности кнопки */
-        .btn-left { display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden; }
-        .play-icon { font-size: 1rem; min-width: 20px; }
-        
-        /* Бегущая строка */
         .text-mask { flex: 1; overflow: hidden; white-space: nowrap; position: relative; }
         .scrolling-text { display: inline-block; }
-        /* Анимация запускается JS-ом если текст длинный */
         .animate-scroll { animation: marquee 5s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* МИНИ ЭКВАЛАЙЗЕР В КНОПКЕ */
-        .mini-eq {
-            display: flex; gap: 2px; align-items: flex-end; height: 15px; width: 15px; margin-left: 10px;
-        }
+        .mini-eq { display: flex; gap: 2px; align-items: flex-end; height: 15px; width: 15px; margin-left: 10px; }
         .bar { width: 3px; background: #000; height: 2px; transition: 0.2s; }
         .track-btn.active .bar { animation: jump 0.5s infinite; }
         .track-btn.active .bar:nth-child(1) { animation-delay: 0s; }
@@ -163,48 +152,48 @@
 
     <div class="header">
         <div class="logo">ART <span>HOLIDAYS</span></div>
-        <div class="subtitle">ROMAN AI CREATOR</div>
+        <div class="subtitle js-matrix-text">ROMAN AI CREATOR</div>
     </div>
 
     <div class="section-title">ВИДЕО <span>ПРОДАКШН</span></div>
     <div class="video-grid">
         <div class="glass-card">
-            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+1"><source src="promo.mp4" type="video/mp4"></video>
+            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+1"><source src="v1.mp4" type="video/mp4"></video>
             <div class="card-content">
-                <div class="card-title">Рекламный Ролик</div>
+                <div class="card-title">LIT ENERGY</div>
                 <div class="card-tag">COMMERCIAL</div>
             </div>
         </div>
         <div class="glass-card">
-            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+2"><source src="promo2.mp4" type="video/mp4"></video>
+            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+2"><source src="v2.mp4" type="video/mp4"></video>
             <div class="card-content">
-                <div class="card-title">Музыкальный Клип</div>
-                <div class="card-tag">MUSIC VIDEO</div>
+                <div class="card-title">EKZO</div>
+                <div class="card-tag">COMMERCIAL</div>
             </div>
         </div>
         <div class="glass-card">
-            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+3"><source src="promo3.mp4" type="video/mp4"></video>
+            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+3"><source src="v3.mp4" type="video/mp4"></video>
             <div class="card-content">
-                <div class="card-title">Showreel 2024</div>
-                <div class="card-tag">EDITING</div>
+                <div class="card-title">LIT ENERGY</div>
+                <div class="card-tag">COMMERCIAL</div>
             </div>
         </div>
         <div class="glass-card">
-            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+4"><source src="promo4.mp4" type="video/mp4"></video>
+            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+4"><source src="v4.mp4" type="video/mp4"></video>
             <div class="card-content">
-                <div class="card-title">Fashion Film</div>
-                <div class="card-tag">STYLE</div>
+                <div class="card-title">BURN</div>
+                <div class="card-tag">COMMERCIAL</div>
             </div>
         </div>
         <div class="glass-card">
-            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+5"><source src="promo5.mp4" type="video/mp4"></video>
+            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+5"><source src="v5.mp4" type="video/mp4"></video>
             <div class="card-content">
                 <div class="card-title">3D Анимация</div>
                 <div class="card-tag">VFX</div>
             </div>
         </div>
         <div class="glass-card">
-            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+6"><source src="promo6.mp4" type="video/mp4"></video>
+            <video controls playsinline preload="metadata" poster="https://placehold.co/600x340/111/39ff14?text=VIDEO+6"><source src="v6.mp4" type="video/mp4"></video>
             <div class="card-content">
                 <div class="card-title">Reels Контент</div>
                 <div class="card-tag">SOCIAL</div>
@@ -213,60 +202,59 @@
     </div>
 
     <div class="section-title">НЕЙРО <span>ГАЛЕРЕЯ</span></div>
-    <div class="gallery-wrapper" id="gallery-container">
-        </div>
+    <div class="gallery-wrapper" id="gallery-container"></div>
 
     <div class="section-title">МУЗЫКАЛЬНАЯ <span>ЛАБОРАТОРИЯ</span></div>
     
     <div class="music-section">
         <div class="music-group-title">На заказ</div>
         
-        <div class="track-btn style-rect" onclick="playTrack('s1', 'Рекламное Промо', this)">
+        <div class="track-btn" onclick="playTrack('s1', 'На заказ для любимой', this)">
             <div class="btn-left">
                 <span class="play-icon">▶</span>
-                <div class="text-mask"><span class="scrolling-text">Рекламное Промо</span></div>
+                <div class="text-mask"><span class="scrolling-text">На заказ для любимой</span></div>
             </div>
             <div class="mini-eq"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
         </div>
 
-        <div class="track-btn style-rect" onclick="playTrack('s2', 'Показ Мод (Фон)', this)">
+        <div class="track-btn" onclick="playTrack('s2', 'Свдение и бит', this)">
             <div class="btn-left">
                 <span class="play-icon">▶</span>
-                <div class="text-mask"><span class="scrolling-text">Показ Мод (Фон)</span></div>
+                <div class="text-mask"><span class="scrolling-text">Свдение и бит</span></div>
             </div>
             <div class="mini-eq"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
         </div>
 
-        <div class="track-btn style-rect" onclick="playTrack('s3', 'Интро для IT', this)">
+        <div class="track-btn" onclick="playTrack('s3', 'Заказ на день рождения', this)">
             <div class="btn-left">
                 <span class="play-icon">▶</span>
-                <div class="text-mask"><span class="scrolling-text">Интро для IT</span></div>
+                <div class="text-mask"><span class="scrolling-text">Заказ на день рождения</span></div>
             </div>
             <div class="mini-eq"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
         </div>
 
         <div class="music-group-title">Мои треки</div>
 
-        <div class="track-btn style-oval" onclick="playTrack('ss1', 'Кибер Атмосфера', this)">
+        <div class="track-btn" onclick="playTrack('s4', 'In The End (REMIX)', this)">
             <div class="btn-left">
                 <span class="play-icon">▶</span>
-                <div class="text-mask"><span class="scrolling-text">Кибер Атмосфера</span></div>
+                <div class="text-mask"><span class="scrolling-text">In The End (REMIX)</span></div>
             </div>
             <div class="mini-eq"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
         </div>
 
-        <div class="track-btn style-oval" onclick="playTrack('ss2', 'Шрамы вместо её имени (Remix)', this)">
+        <div class="track-btn" onclick="playTrack('s5', 'Ты соль на рану (Remix)', this)">
             <div class="btn-left">
                 <span class="play-icon">▶</span>
-                <div class="text-mask"><span class="scrolling-text">Шрамы вместо её имени (Remix)</span></div>
+                <div class="text-mask"><span class="scrolling-text">Ты соль на рану (Remix)</span></div>
             </div>
             <div class="mini-eq"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
         </div>
 
-        <div class="track-btn style-oval" onclick="playTrack('ss3', 'Ночной Драйв', this)">
+        <div class="track-btn" onclick="playTrack('s6', 'Шрамы вместо её имени', this)">
             <div class="btn-left">
                 <span class="play-icon">▶</span>
-                <div class="text-mask"><span class="scrolling-text">Ночной Драйв</span></div>
+                <div class="text-mask"><span class="scrolling-text">Шрамы вместо её имени</span></div>
             </div>
             <div class="mini-eq"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
         </div>
@@ -274,7 +262,7 @@
 
     <div class="footer-links">
         <a href="https://t.me/RomanArtHolidays" class="tg-btn">Связаться в Telegram</a>
-        <a href="https://vk.com/artholidays_ai" class="tg-btn" style="border-color:#fff; color:#fff;">Группа VK</a>
+        <a href="https://vk.com/artholidays_ai" class="tg-btn">Группа VK</a>
     </div>
 
     <audio id="audio"></audio>
@@ -284,27 +272,26 @@
     </div>
 
     <script>
-        // --- ЧАСТИЦЫ ---
+        // МАТРИЦА
+        const subtitle = document.querySelector('.js-matrix-text');
+        const text = subtitle.innerText;
+        subtitle.innerHTML = text.split('').map(letter => `<span>${letter}</span>`).join('');
+        subtitle.querySelectorAll('span').forEach(span => { span.style.animationDelay = `${Math.random() * 2}s`; });
+
+        // ЧАСТИЦЫ
         const canvas = document.getElementById('canvas1'); const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         let particles = [];
         class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2; this.speedX = Math.random() * 0.5 - 0.25; this.speedY = Math.random() * 0.5 - 0.25;
-            }
-            update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0; if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0; if (this.y < 0) this.y = canvas.height;
-            }
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2; this.speedX = Math.random() * 0.5 - 0.25; this.speedY = Math.random() * 0.5 - 0.25; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width) this.x = 0; if (this.x < 0) this.x = canvas.width; if (this.y > canvas.height) this.y = 0; if (this.y < 0) this.y = canvas.height; }
             draw() { ctx.fillStyle = 'rgba(57, 255, 20, 0.3)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
         function initParticles() { particles = []; for(let i=0; i<40; i++) particles.push(new Particle()); }
         function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animate); }
         initParticles(); animate();
 
-        // --- ГАЛЕРЕЯ ---
+        // ГАЛЕРЕЯ
         const gallery = document.getElementById('gallery-container');
         const tags = ["КИБЕРПАНК", "НЕОН", "АБСТРАКЦИЯ", "SCIFI", "ПОРТРЕТ"];
         for(let i=1; i<=20; i++){
@@ -313,7 +300,7 @@
             gallery.innerHTML += `<div class="gallery-item"><img src="p${i}.jpg" onerror="this.src='${ph}'"><div class="gallery-overlay"><div class="gallery-tag">${tag}</div></div></div>`;
         }
 
-        // --- МУЗЫКА ---
+        // МУЗЫКА
         const audio = document.getElementById('audio');
         const stickyPlayer = document.getElementById('stickyPlayer');
         const playerText = document.getElementById('playerText');
@@ -321,23 +308,19 @@
         let currentBtn = null;
 
         function playTrack(id, name, btn) {
-            // Сброс старой кнопки
             if (currentBtn) {
                 currentBtn.classList.remove('active');
                 currentBtn.querySelector('.play-icon').innerText = '▶';
-                // Остановить бегущую строку
                 const oldText = currentBtn.querySelector('.scrolling-text');
                 oldText.classList.remove('animate-scroll'); 
             }
 
-            // Если клик по тому же треку -> пауза
             if (currentBtn === btn && !audio.paused) {
                 audio.pause();
                 mainBtn.innerText = '▶';
                 return;
             }
             
-            // Если клик по тому же треку на паузе -> плей
             if (currentBtn === btn && audio.paused) {
                 audio.play();
                 btn.classList.add('active');
@@ -346,12 +329,10 @@
                 return;
             }
 
-            // Новый трек
             currentBtn = btn;
             btn.classList.add('active');
             btn.querySelector('.play-icon').innerText = '❚❚';
             
-            // Проверка длины текста для бегущей строки
             const textSpan = btn.querySelector('.scrolling-text');
             if (textSpan.offsetWidth > btn.querySelector('.text-mask').offsetWidth) {
                 textSpan.classList.add('animate-scroll');
@@ -361,7 +342,6 @@
             stickyPlayer.classList.add('visible');
             mainBtn.innerText = '❚❚';
 
-            // Умная загрузка (mp3 -> wav)
             const mp3 = id + '.mp3';
             const wav = id + '.wav';
             
@@ -385,13 +365,12 @@
                 audio.pause();
                 mainBtn.innerText = '▶';
                 if(currentBtn) {
-                    currentBtn.classList.remove('active'); // Убираем активность (эквалайзер стоп)
+                    currentBtn.classList.remove('active');
                     currentBtn.querySelector('.play-icon').innerText = '▶';
                 }
             }
         }
 
-        // Автостоп видео при проигрывании аудио
         const videos = document.querySelectorAll('video');
         audio.onplay = () => { videos.forEach(v => v.pause()); };
         videos.forEach(v => v.onplay = () => { audio.pause(); mainBtn.innerText = '▶'; if(currentBtn) {currentBtn.classList.remove('active'); currentBtn.querySelector('.play-icon').innerText = '▶';} });
