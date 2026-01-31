@@ -16,11 +16,56 @@
             align-items: center; justify-content: center;
         }
 
+        /* --- PRELOADER (ЭКРАН ЗАГРУЗКИ) --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 99999; /* Поверх всего */
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 1s ease-out; /* Плавное исчезновение */
+        }
+        
+        .loader-text {
+            font-family: 'Oswald', sans-serif; 
+            color: #39ff14; 
+            letter-spacing: 3px; 
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            animation: blink 1.5s infinite;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            position: absolute; left: 0; top: 0;
+            height: 100%; width: 50%;
+            background: #39ff14;
+            box-shadow: 0 0 15px #39ff14;
+            animation: loading-bar 1s infinite ease-in-out;
+        }
+
+        @keyframes loading-bar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(250%); }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         /* --- ВИДЕО ФОН --- */
         .video-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; z-index: -1;
-            filter: brightness(0.4); /* Затемнение, чтобы текст читался */
+            filter: brightness(0.4); 
         }
         .noise-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -44,10 +89,10 @@
         }
         .highlight { color: #39ff14; }
 
-        /* --- НАВИГАЦИЯ (СТЕКЛЯННЫЕ БЛОКИ) --- */
+        /* --- НАВИГАЦИЯ --- */
         .nav-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+            grid-template-columns: repeat(3, 1fr); 
             gap: 30px;
             width: 80%; max-width: 1200px;
             animation: fadeInUp 1s ease 0.3s forwards; opacity: 0;
@@ -90,7 +135,6 @@
             letter-spacing: 1px;
         }
 
-        /* АНИМАЦИИ */
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -98,7 +142,14 @@
 </head>
 <body>
 
-    <video class="video-bg" autoplay muted loop playsinline>
+    <div id="preloader">
+        <div class="loader-text">ЗАГРУЗКА ИНТЕРФЕЙСА...</div>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+
+    <video class="video-bg" id="bg-video" autoplay muted loop playsinline>
         <source src="bg.mp4" type="video/mp4">
     </video>
     <div class="noise-overlay"></div>
@@ -109,39 +160,56 @@
     </div>
 
     <div class="nav-grid">
-        
         <a href="videos.html" class="nav-card">
             <div class="card-icon">🎬</div>
             <div class="card-title">Production</div>
             <div class="card-desc">Реклама, Клипы, Шоурилы</div>
         </a>
-
         <a href="music.html" class="nav-card">
             <div class="card-icon">🎧</div>
             <div class="card-title">Music Lab</div>
             <div class="card-desc">Электронная музыка и саунд-дизайн</div>
         </a>
-
         <a href="photos.html" class="nav-card">
             <div class="card-icon">📸</div>
             <div class="card-title">Neuro Art</div>
             <div class="card-desc">Галерея AI генераций</div>
         </a>
-
     </div>
 
     <div class="footer">EST. 2024 • DESIGNED BY ROMAN AI</div>
 
     <script>
+        // --- ЛОГИКА ЗАГРУЗЧИКА ---
+        const video = document.getElementById('bg-video');
+        const preloader = document.getElementById('preloader');
+
+        // Функция скрытия загрузчика
+        function hidePreloader() {
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 1000); // Ждем пока пройдет анимация прозрачности (1с)
+        }
+
+        // 1. Если видео уже готово (в кэше браузера)
+        if (video.readyState >= 3) {
+            hidePreloader();
+        } 
+        // 2. Иначе ждем события загрузки
+        else {
+            video.addEventListener('canplaythrough', hidePreloader);
+            video.addEventListener('loadeddata', hidePreloader);
+        }
+
+        // 3. СТРАХОВКА: Если видео сломалось или грузится вечность
+        // Через 4 секунды убираем загрузчик принудительно
+        setTimeout(hidePreloader, 4000);
+
+        // --- МОБИЛЬНАЯ ПРОВЕРКА ---
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            // Если зашли с телефона - сразу кидаем на mobile.html
-            // Но даем кнопку "Вернуться", если вдруг нужно
-            // Для начала просто перенаправим:
-            // window.location.href = "mobile.html"; 
-            
-            // ЛИБО (Лучший вариант) - показываем заглушку как раньше
             const mobileAlert = document.createElement('div');
-            mobileAlert.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;";
+            mobileAlert.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;";
             mobileAlert.innerHTML = `
                 <h2 style="color:#39ff14;font-family:sans-serif;">MOBILE DETECTED</h2>
                 <a href="mobile.html" style="background:#39ff14;color:#000;text-decoration:none;padding:15px 30px;border-radius:30px;font-weight:bold;font-family:sans-serif;margin-top:20px;">GO TO MOBILE VERSION</a>

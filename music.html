@@ -16,10 +16,39 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- КАНВАСЫ --- */
-        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        #canvas-visualizer { z-index: 2; filter: drop-shadow(0 0 30px rgba(57, 255, 20, 0.3)); }
+        /* --- КАНВАСЫ (СЛОИ) --- */
+        canvas { 
+            position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            pointer-events: none; /* Чтобы клики проходили сквозь них */
+        }
+        #canvas-visualizer { z-index: 2; filter: drop-shadow(0 0 30px rgba(57, 255, 20, 0.4)); }
         #canvas-bg { z-index: 1; }
+
+        /* --- ЦЕНТРАЛЬНАЯ КНОПКА (PLAY/PAUSE) --- */
+        .center-control {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #39ff14;
+            color: #39ff14;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; cursor: pointer;
+            z-index: 50; /* Поверх канваса */
+            transition: 0.2s;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+        }
+        .center-control:hover {
+            background: #39ff14; color: #000;
+            box-shadow: 0 0 40px rgba(57, 255, 20, 0.6);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        .center-control:active {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
 
         /* --- ИНТЕРФЕЙС --- */
         .nav-bar {
@@ -37,28 +66,16 @@
         .back-btn:hover { color: #39ff14; padding-left: 10px; }
         
         .page-title { 
-            font-family: 'Oswald', sans-serif; 
-            font-size: 1.5rem; 
-            color: #fff;
-            text-transform: uppercase; 
-            letter-spacing: 3px; 
-            margin: 0; 
+            font-family: 'Oswald', sans-serif; font-size: 1.5rem; 
+            color: #fff; text-transform: uppercase; letter-spacing: 3px; margin: 0; 
         }
-        .page-title span {
-            color: #39ff14;
-        }
+        .page-title span { color: #39ff14; }
 
         /* --- КОНТЕЙНЕР --- */
         .main-container {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            height: 100%; 
-            width: 100%; 
-            padding: 0 5%;
-            box-sizing: border-box; 
-            position: relative; 
-            z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            height: 100%; width: 100%; padding: 0 5%;
+            box-sizing: border-box; position: relative; z-index: 10;
         }
 
         .panel {
@@ -80,11 +97,8 @@
         /* КНОПКА YANDEX */
         .ya-btn {
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            background: transparent; 
-            border: 1px solid #39ff14; 
-            color: #fff; text-decoration: none;
-            padding: 8px; border-radius: 50px;
-            font-size: 0.7rem; font-weight: bold; letter-spacing: 1px;
+            background: transparent; border: 1px solid #39ff14; color: #fff; text-decoration: none;
+            padding: 8px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px;
             transition: 0.3s; margin-bottom: 10px;
         }
         .ya-btn:hover { background: #39ff14; color: #000; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
@@ -98,13 +112,10 @@
             font-family: 'Manrope', sans-serif; text-transform: uppercase;
             font-size: 0.85rem; border: none; outline: none;
             position: relative; overflow: hidden;
+            border-radius: 50px; /* Все овальные */
         }
         .track-btn:hover { transform: scale(1.05); background: #fff; }
         .track-btn.active { background: #fff; box-shadow: 0 0 25px rgba(57, 255, 20, 0.8); }
-
-        .left-style { border-radius: 50px; } 
-        .right-style { border-radius: 50px; }
-        
         .play-icon { font-size: 1.2rem; font-weight: bold; }
 
         /* --- НИЖНЯЯ ПАНЕЛЬ СТАТУСА --- */
@@ -118,98 +129,56 @@
             text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
         }
 
-        /* --- АНИМАЦИЯ ЗАГРУЗКИ (CYBER LOADER) --- */
+        /* --- ЗАГРУЗЧИК --- */
         .loader-box {
             width: 200px; height: 2px; background: rgba(255,255,255,0.1);
             margin: 10px auto; position: relative; overflow: hidden; display: none;
         }
         .loader-bar {
             position: absolute; left: 0; top: 0; height: 100%; width: 50%;
-            background: #39ff14;
-            box-shadow: 0 0 10px #39ff14;
+            background: #39ff14; box-shadow: 0 0 10px #39ff14;
             animation: cyber-load 1s infinite linear;
         }
-        @keyframes cyber-load {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(250%); }
-        }
+        @keyframes cyber-load { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
 
-        /* =========================================
-           🤖 STYLES ДЛЯ МУЗЫКАЛЬНОГО БОТА
-           ========================================= */
-        
+        /* --- ЧАТ БОТ --- */
         .chat-toggle-btn {
-            position: fixed; bottom: 30px; right: 30px;
-            width: 60px; height: 60px;
-            background: #000;
-            border: 2px solid #39ff14;
-            border-radius: 50%;
-            color: #39ff14; font-size: 30px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 200;
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
-            transition: 0.3s;
-            animation: pulse-chat 2s infinite;
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: #000; border: 2px solid #39ff14; border-radius: 50%;
+            color: #39ff14; font-size: 30px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 200; box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+            transition: 0.3s; animation: pulse-chat 2s infinite;
         }
         .chat-toggle-btn:hover { transform: scale(1.1); background: #39ff14; color: #000; }
         @keyframes pulse-chat { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(57, 255, 20, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); } }
 
         .chat-window {
-            position: fixed; bottom: 100px; right: 30px;
-            width: 350px; height: 450px;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(15px);
-            border: 1px solid #39ff14;
-            border-radius: 20px;
-            display: none; flex-direction: column;
-            overflow: hidden; z-index: 200;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
-            transform-origin: bottom right;
+            position: fixed; bottom: 100px; right: 30px; width: 350px; height: 450px;
+            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px);
+            border: 1px solid #39ff14; border-radius: 20px;
+            display: none; flex-direction: column; overflow: hidden; z-index: 200;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8); transform-origin: bottom right;
             animation: openChat 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes openChat { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .chat-header {
-            background: linear-gradient(90deg, #111, #000);
-            padding: 15px; border-bottom: 1px solid #333;
-            display: flex; align-items: center; justify-content: space-between;
-        }
+        .chat-header { background: linear-gradient(90deg, #111, #000); padding: 15px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
         .bot-name { font-family: 'Oswald', sans-serif; color: #fff; font-size: 1.1rem; letter-spacing: 1px; }
         .bot-status { width: 8px; height: 8px; background: #39ff14; border-radius: 50%; box-shadow: 0 0 5px #39ff14; margin-left: 10px; display: inline-block; }
         .close-chat { background: none; border: none; color: #666; font-size: 1.2rem; cursor: pointer; }
         .close-chat:hover { color: #fff; }
-
-        .chat-body {
-            flex: 1; padding: 20px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 15px;
-        }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         .chat-body::-webkit-scrollbar { width: 5px; }
         .chat-body::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-
         .msg { max-width: 80%; padding: 10px 15px; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .msg-bot { background: #222; color: #fff; border-bottom-left-radius: 2px; border: 1px solid #333; }
         .msg-user { background: #39ff14; color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 600; }
-        
         .typing { font-style: italic; color: #666; font-size: 0.8rem; margin-left: 10px; display: none; }
-
-        .chat-controls {
-            padding: 15px; border-top: 1px solid #333;
-            display: flex; gap: 10px; flex-wrap: wrap;
-        }
-        .choice-btn {
-            flex: 1;
-            background: transparent; border: 1px solid #39ff14;
-            color: #39ff14; padding: 10px; border-radius: 8px;
-            cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: bold;
-            font-size: 0.8rem; transition: 0.2s;
-        }
+        .chat-controls { padding: 15px; border-top: 1px solid #333; display: flex; gap: 10px; flex-wrap: wrap; }
+        .choice-btn { flex: 1; background: transparent; border: 1px solid #39ff14; color: #39ff14; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: bold; font-size: 0.8rem; transition: 0.2s; }
         .choice-btn:hover { background: #39ff14; color: #000; }
-
-        @media (max-width: 500px) {
-            .chat-window { width: 90%; right: 5%; bottom: 100px; height: 400px; }
-        }
+        @media (max-width: 500px) { .chat-window { width: 90%; right: 5%; bottom: 100px; height: 400px; } }
 
     </style>
 </head>
@@ -217,6 +186,10 @@
 
     <canvas id="canvas-bg"></canvas>
     <canvas id="canvas-visualizer"></canvas>
+
+    <div class="center-control" id="centerBtn" onclick="togglePlayCenter()">
+        ▶
+    </div>
 
     <div class="nav-bar">
         <a href="index.html" class="back-btn">← На главную</a>
@@ -267,19 +240,14 @@
 
     <audio id="audio" crossorigin="anonymous"></audio>
 
-    <div class="chat-toggle-btn" onclick="toggleChat()">
-        💬
-    </div>
-
+    <div class="chat-toggle-btn" onclick="toggleChat()">💬</div>
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
-            <div class="bot-name">ART-HOLIDAYS AI <span class="bot-status"></span></div>
+            <div class="bot-name">MUSIC ASSISTANT <span class="bot-status"></span></div>
             <button class="close-chat" onclick="toggleChat()">✕</button>
         </div>
-        
         <div class="chat-body" id="chatBody"></div>
         <div class="typing" id="typingIndicator">AI печатает...</div>
-
         <div class="chat-controls" id="chatControls">
             <button class="choice-btn" onclick="userChoice('vk')">Заказать (VK)</button>
             <button class="choice-btn" onclick="userChoice('tg')">Лично Роману (TG)</button>
@@ -303,9 +271,11 @@
         const audio = document.getElementById('audio');
         const statusLabel = document.getElementById('track-name');
         const loader = document.getElementById('loader');
+        const centerBtn = document.getElementById('centerBtn');
         
         let audioContext, analyser, dataArray;
         let isAudioSetup = false;
+        let currentBtn = null; // Запоминаем кнопку текущего трека
 
         function setupAudioContext() {
             if (!isAudioSetup) {
@@ -325,26 +295,41 @@
             }
         }
 
-        // --- 3. PLAY LOGIC ---
+        // --- 3. ЛОГИКА ВОСПРОИЗВЕДЕНИЯ ---
+
+        // Клик по треку в списке
         function playSmart(fileId, name, btn) {
             setupAudioContext();
+            currentBtn = btn;
 
-            // Если Пауза
+            // Если это тот же трек и он играет -> Пауза
             if (btn.classList.contains('active') && !audio.paused) {
                 audio.pause();
-                resetUI();
+                resetUI(false); // false = не сбрасывать "активность" полностью
                 statusLabel.innerText = "PAUSED";
-                loader.style.display = 'none'; 
+                centerBtn.innerText = "▶"; // Меняем центр на плей
+                loader.style.display = 'none';
                 return;
             }
 
-            resetUI();
+            // Если трек на паузе, но мы снова кликнули по нему -> Продолжить
+            if (btn.classList.contains('active') && audio.paused && audio.src.includes(fileId)) {
+                audio.play();
+                btn.querySelector('.play-icon').innerText = '❚❚';
+                centerBtn.innerText = '❚❚';
+                statusLabel.innerText = "СЕЙЧАС ИГРАЕТ: " + name;
+                return;
+            }
+
+            // Иначе -> Новый трек
+            resetUI(true); // Полный сброс
             btn.classList.add('active');
             btn.querySelector('.play-icon').innerText = '❚❚';
+            centerBtn.innerText = '❚❚';
             
             statusLabel.style.opacity = '1';
             statusLabel.innerText = "ЗАГРУЗКА ТРЕКА...";
-            loader.style.display = 'block'; 
+            loader.style.display = 'block';
 
             const mp3 = fileId + '.mp3';
             const wav = fileId + '.wav';
@@ -361,7 +346,12 @@
 
             audio.onplay = () => {
                 statusLabel.innerText = "СЕЙЧАС ИГРАЕТ: " + name;
-                loader.style.display = 'none'; 
+                loader.style.display = 'none';
+                centerBtn.innerText = '❚❚';
+            };
+
+            audio.onpause = () => {
+                centerBtn.innerText = '▶';
             };
 
             audio.play().catch(e => { 
@@ -373,16 +363,36 @@
             });
         }
 
-        function resetUI() {
+        // Клик по центральной кнопке
+        function togglePlayCenter() {
+            setupAudioContext();
+            if (audio.src) {
+                if (audio.paused) {
+                    audio.play();
+                    centerBtn.innerText = '❚❚';
+                    // Вернуть иконку на текущем треке
+                    if (currentBtn) currentBtn.querySelector('.play-icon').innerText = '❚❚';
+                } else {
+                    audio.pause();
+                    centerBtn.innerText = '▶';
+                    // Вернуть иконку на текущем треке
+                    if (currentBtn) currentBtn.querySelector('.play-icon').innerText = '▶';
+                }
+            }
+        }
+
+        function resetUI(fullReset) {
             document.querySelectorAll('.track-btn').forEach(b => {
-                b.classList.remove('active');
+                if(fullReset) b.classList.remove('active');
                 b.querySelector('.play-icon').innerText = '▶';
             });
             loader.style.display = 'none';
         }
 
-        // --- 4. PARTICLES ---
+        // --- 4. PARTICLES & SHOCKWAVES ---
         let particles = [];
+        let shockwaves = []; // Массив для волн
+
         class Particle {
             constructor() {
                 this.x = Math.random() * bgCanvas.width;
@@ -405,6 +415,31 @@
         }
         for(let i=0; i<60; i++) particles.push(new Particle());
 
+        // Класс для Волны (Shockwave)
+        class Shockwave {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 120; // Начальный радиус (чуть меньше эквалайзера)
+                this.alpha = 1;
+                this.lineWidth = 5;
+            }
+            update() {
+                this.radius += 4; // Скорость расширения
+                this.alpha -= 0.02; // Скорость исчезновения
+                this.lineWidth -= 0.05;
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(57, 255, 20, ${this.alpha})`;
+                ctx.lineWidth = Math.max(0.1, this.lineWidth);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
         // --- 5. RENDER LOOP ---
         function render() {
             bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
@@ -412,14 +447,47 @@
 
             const isPlaying = !audio.paused && !audio.ended && audio.currentTime > 0;
             
+            // 1. Частицы
             particles.forEach(p => { p.update(isPlaying); p.draw(); });
 
-            if (isAudioSetup && isPlaying) analyser.getByteFrequencyData(dataArray);
-            else if(dataArray) dataArray.fill(0);
+            // 2. Аудио данные
+            let averageFreq = 0;
+            if (isAudioSetup && isPlaying) {
+                analyser.getByteFrequencyData(dataArray);
+                // Считаем среднюю громкость для детектора битов
+                let sum = 0;
+                for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
+                averageFreq = sum / dataArray.length;
+            } else if(dataArray) {
+                dataArray.fill(0);
+            }
 
             const cx = visCanvas.width / 2;
             const cy = visCanvas.height / 2;
-            visCtx.fillStyle = '#000'; visCtx.strokeStyle = '#39ff14'; visCtx.lineWidth = 3;
+
+            // 3. Генерация ВОЛН (Если громкий бас)
+            if (averageFreq > 100) { // Порог чувствительности (можно менять)
+                // Добавляем волну не каждый кадр, а иногда
+                if (Math.random() > 0.8) { 
+                    shockwaves.push(new Shockwave(cx, cy));
+                }
+            }
+
+            // Рисуем и обновляем волны
+            for (let i = 0; i < shockwaves.length; i++) {
+                shockwaves[i].update();
+                shockwaves[i].draw(visCtx);
+                // Удаляем исчезнувшие
+                if (shockwaves[i].alpha <= 0) {
+                    shockwaves.splice(i, 1);
+                    i--;
+                }
+            }
+
+            // 4. ЭКВАЛАЙЗЕР (Основной круг)
+            visCtx.fillStyle = '#000'; 
+            visCtx.strokeStyle = '#39ff14'; 
+            visCtx.lineWidth = 3;
             visCtx.beginPath();
             
             const bars = 100;
@@ -430,23 +498,20 @@
                     const idx = Math.floor((i/bars) * (dataArray.length * 0.7));
                     freq = dataArray[idx] || 0;
                 }
-                const r = 150 + (freq / 255 * 60) + ((!isPlaying) ? Math.sin(Date.now()/500)*10 : 0);
+                const r = 130 + (freq / 255 * 70) + ((!isPlaying) ? Math.sin(Date.now()/500)*10 : 0);
                 const x = cx + Math.cos(angle) * r;
                 const y = cy + Math.sin(angle) * r;
                 if(i===0) visCtx.moveTo(x,y); else visCtx.lineTo(x,y);
             }
-            visCtx.closePath(); visCtx.fill(); visCtx.stroke();
-            visCtx.beginPath(); visCtx.fillStyle = 'rgba(255,255,255,0.15)';
-            visCtx.arc(cx - 50, cy - 50, 30, 0, Math.PI*2); visCtx.fill();
-
+            visCtx.closePath(); 
+            visCtx.fill(); 
+            visCtx.stroke();
+            
             requestAnimationFrame(render);
         }
         render();
 
-        // =========================================
-        // 🤖 СКРИПТ ЧАТ-БОТА (МУЗЫКА)
-        // =========================================
-        
+        // --- ЧАТ БОТ ЛОГИКА ---
         const chatWindow = document.getElementById('chatWindow');
         const chatBody = document.getElementById('chatBody');
         const typing = document.getElementById('typingIndicator');
@@ -458,24 +523,18 @@
                 chatWindow.style.display = 'none';
             } else {
                 chatWindow.style.display = 'flex';
-                if (!isChatInitiated) {
-                    initBot();
-                    isChatInitiated = true;
-                }
+                if (!isChatInitiated) { initBot(); isChatInitiated = true; }
             }
         }
 
-        // Сценарий для музыки
         function initBot() {
             addBotMessage("Загрузка музыкальных протоколов...");
-            
             setTimeout(() => {
                 showTyping(true);
                 setTimeout(() => {
                     showTyping(false);
                     addBotMessage("Привет! Нужен эксклюзивный бит, сведение или трек под ключ?");
                 }, 1000);
-
                 setTimeout(() => {
                     showTyping(true);
                     setTimeout(() => {
@@ -489,57 +548,34 @@
 
         function userChoice(type) {
             controls.style.display = 'none';
-
             if (type === 'vk') {
                 addUserMessage("Группа VK");
                 showTyping(true);
                 setTimeout(() => {
                     showTyping(false);
                     addBotMessage("Открываю группу VK для обсуждения заказа... 🎧");
-                    setTimeout(() => {
-                        window.open("https://vk.com/artholidays_ai", "_blank");
-                    }, 2000);
+                    setTimeout(() => window.open("https://vk.com/artholidays_ai", "_blank"), 2000);
                 }, 1000);
-            } 
-            else if (type === 'tg') {
+            } else if (type === 'tg') {
                 addUserMessage("Лично Роману (TG)");
                 showTyping(true);
                 setTimeout(() => {
                     showTyping(false);
                     addBotMessage("Соединяю с Романом в Telegram... 🎹");
-                    setTimeout(() => {
-                        window.open("https://t.me/RomanArtHolidays", "_blank");
-                    }, 2000);
+                    setTimeout(() => window.open("https://t.me/RomanArtHolidays", "_blank"), 2000);
                 }, 1000);
             }
-            
             setTimeout(() => { controls.style.display = 'flex'; }, 5000);
         }
-
         function addBotMessage(text) {
-            const div = document.createElement('div');
-            div.className = 'msg msg-bot';
-            div.innerText = text;
-            chatBody.appendChild(div);
-            scrollToBottom();
+            const div = document.createElement('div'); div.className = 'msg msg-bot'; div.innerText = text; chatBody.appendChild(div); scrollToBottom();
         }
-
         function addUserMessage(text) {
-            const div = document.createElement('div');
-            div.className = 'msg msg-user';
-            div.innerText = text;
-            chatBody.appendChild(div);
-            scrollToBottom();
+            const div = document.createElement('div'); div.className = 'msg msg-user'; div.innerText = text; chatBody.appendChild(div); scrollToBottom();
         }
+        function showTyping(show) { typing.style.display = show ? 'block' : 'none'; scrollToBottom(); }
+        function scrollToBottom() { chatBody.scrollTop = chatBody.scrollHeight; }
 
-        function showTyping(show) {
-            typing.style.display = show ? 'block' : 'none';
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }
     </script>
 </body>
 </html>
