@@ -16,7 +16,7 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- КАНВАСЫ --- */
+        /* --- КАНВАСЫ (СЛОИ) --- */
         canvas { 
             position: fixed; top: 0; left: 0; 
             width: 100%; height: 100%; 
@@ -33,6 +33,7 @@
             transform: translate(-50%, -50%);
             z-index: 50; /* ВЫШЕ ВСЕГО (важно!) */
             pointer-events: auto; /* Чтобы кликалась */
+            display: flex; justify-content: center; align-items: center;
         }
 
         .play-circle {
@@ -46,6 +47,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
+            backdrop-filter: blur(5px);
         }
 
         .play-circle:hover {
@@ -373,7 +375,7 @@
             loader.style.display = 'none';
         }
 
-        // --- ВИЗУАЛИЗАТОР (ИСПРАВЛЕННЫЙ ЦЕНТР) ---
+        // --- ВИЗУАЛИЗАТОР (ИСПРАВЛЕННЫЙ И СИММЕТРИЧНЫЙ) ---
         let particles = [];
         let shockwaves = []; 
 
@@ -397,10 +399,28 @@
             constructor(x, y) {
                 this.x = x; this.y = y; this.radius = 120; this.alpha = 1; this.lineWidth = 5;
             }
-            update() { this.radius += 4; this.alpha -= 0.02; this.lineWidth -= 0.05; }
+            update() { 
+                this.radius += 4; 
+                this.alpha -= 0.02; 
+                this.lineWidth -= 0.05; 
+            }
             draw(ctx) {
-                ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(57, 255, 20, ${this.alpha})`; ctx.lineWidth = Math.max(0.1, this.lineWidth); ctx.stroke(); ctx.restore();
+                ctx.save(); ctx.beginPath(); 
+                
+                // Делаем волну тоже немного "рваной" для стиля
+                for (let i = 0; i <= 60; i++) {
+                    const angle = (Math.PI * 2 * i) / 60;
+                    const jitter = Math.random() * 5;
+                    const r = this.radius + jitter;
+                    const x = this.x + Math.cos(angle) * r;
+                    const y = this.y + Math.sin(angle) * r;
+                    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                }
+                
+                ctx.closePath();
+                ctx.strokeStyle = `rgba(57, 255, 20, ${this.alpha})`; 
+                ctx.lineWidth = Math.max(0.1, this.lineWidth); 
+                ctx.stroke(); ctx.restore();
             }
         }
 
@@ -417,7 +437,7 @@
                 averageFreq = sum / dataArray.length;
             } else if(dataArray) dataArray.fill(0);
 
-            // КООРДИНАТЫ ЦЕНТРА ЭКРАНА
+            // ФИКС ЦЕНТРА: БЕРЕМ РАЗМЕРЫ ОКНА БРАУЗЕРА НАПРЯМУЮ
             const cx = window.innerWidth / 2;
             const cy = window.innerHeight / 2;
 
@@ -429,33 +449,31 @@
                 if (shockwaves[i].alpha <= 0) { shockwaves.splice(i, 1); i--; }
             }
 
-            // РИСУЕМ СИММЕТРИЧНЫЙ КРУГ
+            // РИСУЕМ ЭКВАЛАЙЗЕР С ЗЕРКАЛЬНОЙ СИММЕТРИЕЙ
             visCtx.fillStyle = '#000'; 
             visCtx.strokeStyle = '#39ff14'; 
             visCtx.lineWidth = 3;
             visCtx.beginPath();
             
-            const totalPoints = 120; // Количество точек
-            // Используем только половину массива данных для симметрии
-            const dataLen = dataArray ? Math.floor(dataArray.length / 2) : 0; 
+            const totalPoints = 120;
+            // Данные только до половины, чтобы отзеркалить
+            const halfData = dataArray ? Math.floor(dataArray.length / 2) : 0; 
             
             for (let i = 0; i <= totalPoints; i++) {
                 const angle = (Math.PI * 2 * i) / totalPoints;
                 
-                // Магия симметрии: 
-                // Если мы во второй половине круга, берем данные в обратном порядке
-                let index;
+                // Зеркалим индекс данных
+                let dataIdx;
                 if (i <= totalPoints / 2) {
-                    index = Math.floor((i / (totalPoints/2)) * dataLen);
+                    dataIdx = Math.floor((i / (totalPoints/2)) * halfData);
                 } else {
-                    index = Math.floor(((totalPoints - i) / (totalPoints/2)) * dataLen);
+                    dataIdx = Math.floor(((totalPoints - i) / (totalPoints/2)) * halfData);
                 }
                 
-                let freq = dataArray ? (dataArray[index] || 0) : 0;
+                let freq = dataArray ? (dataArray[dataIdx] || 0) : 0;
                 
-                // Базовый радиус + искажение от звука + дыхание
+                // Дрожание
                 const r = 130 + (freq / 255 * 80) + ((!isPlaying) ? Math.sin(Date.now()/500)*5 : 0);
-                
                 const x = cx + Math.cos(angle) * r;
                 const y = cy + Math.sin(angle) * r;
                 
