@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roman AI | Music Lab</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Manrope:wght@300;600&display=swap');
+
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Manrope', sans-serif;
+            margin: 0; padding: 0;
+            height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- КАНВАСЫ --- */
+        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        #canvas-visualizer { z-index: 2; filter: drop-shadow(0 0 30px rgba(57, 255, 20, 0.3)); }
+        #canvas-bg { z-index: 1; }
+
+        /* --- ИНТЕРФЕЙС --- */
+        .nav-bar {
+            position: absolute; top: 0; left: 0; width: 100%;
+            padding: 30px 40px; box-sizing: border-box;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        .back-btn {
+            text-decoration: none; color: #888; display: inline-flex; align-items: center; gap: 10px; font-weight: bold; transition: 0.3s; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px;
+        }
+        .back-btn:hover { color: #39ff14; padding-left: 10px; }
+        
+        .page-title { 
+            font-family: 'Oswald', sans-serif; 
+            font-size: 1.5rem; 
+            color: #fff;
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            margin: 0; 
+        }
+        .page-title span {
+            color: #39ff14;
+        }
+
+        /* --- КОНТЕЙНЕР --- */
+        .main-container {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            height: 100%; 
+            width: 100%; 
+            padding: 0 5%;
+            box-sizing: border-box; 
+            position: relative; 
+            z-index: 10;
+        }
+
+        .panel {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 30px;
+            display: flex; flex-direction: column; gap: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3); transition: 0.3s;
+        }
+        .panel:hover { border-color: rgba(57, 255, 20, 0.2); transform: translateY(-5px); }
+        
+        .panel-title {
+            font-family: 'Oswald', sans-serif; font-size: 1.2rem; color: #fff;
+            text-transform: uppercase; text-align: center; margin-bottom: 5px;
+            letter-spacing: 2px; border-bottom: 2px solid #39ff14; padding-bottom: 10px;
+            display: block; width: 100%;
+        }
+
+        /* КНОПКА YANDEX */
+        .ya-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: transparent; 
+            border: 1px solid #39ff14; 
+            color: #fff; text-decoration: none;
+            padding: 8px; border-radius: 50px;
+            font-size: 0.7rem; font-weight: bold; letter-spacing: 1px;
+            transition: 0.3s; margin-bottom: 10px;
+        }
+        .ya-btn:hover { background: #39ff14; color: #000; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+        .ya-icon { width: 16px; height: 16px; fill: currentColor; }
+
+        /* КНОПКИ ТРЕКОВ */
+        .track-btn {
+            background: #39ff14; color: #000; font-weight: bold;
+            padding: 15px 20px; cursor: pointer; transition: all 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Manrope', sans-serif; text-transform: uppercase;
+            font-size: 0.85rem; border: none; outline: none;
+            position: relative; overflow: hidden;
+        }
+        .track-btn:hover { transform: scale(1.05); background: #fff; }
+        .track-btn.active { background: #fff; box-shadow: 0 0 25px rgba(57, 255, 20, 0.8); }
+
+        .left-style { border-radius: 50px; } 
+        .right-style { border-radius: 50px; }
+        
+        .play-icon { font-size: 1.2rem; font-weight: bold; }
+
+        /* --- НИЖНЯЯ ПАНЕЛЬ СТАТУСА --- */
+        .now-playing-container {
+            position: absolute; bottom: 50px; left: 0; width: 100%; text-align: center;
+            z-index: 20;
+        }
+        .now-playing {
+            font-family: 'Oswald', sans-serif; color: #39ff14; letter-spacing: 2px;
+            font-size: 1rem; opacity: 0; transition: opacity 0.5s;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        /* --- АНИМАЦИЯ ЗАГРУЗКИ (CYBER LOADER) --- */
+        .loader-box {
+            width: 200px; height: 2px; background: rgba(255,255,255,0.1);
+            margin: 10px auto; position: relative; overflow: hidden; display: none;
+        }
+        .loader-bar {
+            position: absolute; left: 0; top: 0; height: 100%; width: 50%;
+            background: #39ff14;
+            box-shadow: 0 0 10px #39ff14;
+            animation: cyber-load 1s infinite linear;
+        }
+        @keyframes cyber-load {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(250%); }
+        }
+
+        /* =========================================
+           🤖 STYLES ДЛЯ МУЗЫКАЛЬНОГО БОТА
+           ========================================= */
+        
+        .chat-toggle-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px;
+            background: #000;
+            border: 2px solid #39ff14;
+            border-radius: 50%;
+            color: #39ff14; font-size: 30px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 200;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+            transition: 0.3s;
+            animation: pulse-chat 2s infinite;
+        }
+        .chat-toggle-btn:hover { transform: scale(1.1); background: #39ff14; color: #000; }
+        @keyframes pulse-chat { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(57, 255, 20, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); } }
+
+        .chat-window {
+            position: fixed; bottom: 100px; right: 30px;
+            width: 350px; height: 450px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid #39ff14;
+            border-radius: 20px;
+            display: none; flex-direction: column;
+            overflow: hidden; z-index: 200;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+            transform-origin: bottom right;
+            animation: openChat 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes openChat { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .chat-header {
+            background: linear-gradient(90deg, #111, #000);
+            padding: 15px; border-bottom: 1px solid #333;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .bot-name { font-family: 'Oswald', sans-serif; color: #fff; font-size: 1.1rem; letter-spacing: 1px; }
+        .bot-status { width: 8px; height: 8px; background: #39ff14; border-radius: 50%; box-shadow: 0 0 5px #39ff14; margin-left: 10px; display: inline-block; }
+        .close-chat { background: none; border: none; color: #666; font-size: 1.2rem; cursor: pointer; }
+        .close-chat:hover { color: #fff; }
+
+        .chat-body {
+            flex: 1; padding: 20px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .chat-body::-webkit-scrollbar { width: 5px; }
+        .chat-body::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg-bot { background: #222; color: #fff; border-bottom-left-radius: 2px; border: 1px solid #333; }
+        .msg-user { background: #39ff14; color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 600; }
+        
+        .typing { font-style: italic; color: #666; font-size: 0.8rem; margin-left: 10px; display: none; }
+
+        .chat-controls {
+            padding: 15px; border-top: 1px solid #333;
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .choice-btn {
+            flex: 1;
+            background: transparent; border: 1px solid #39ff14;
+            color: #39ff14; padding: 10px; border-radius: 8px;
+            cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: bold;
+            font-size: 0.8rem; transition: 0.2s;
+        }
+        .choice-btn:hover { background: #39ff14; color: #000; }
+
+        @media (max-width: 500px) {
+            .chat-window { width: 90%; right: 5%; bottom: 100px; height: 400px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-bg"></canvas>
+    <canvas id="canvas-visualizer"></canvas>
+
+    <div class="nav-bar">
+        <a href="index.html" class="back-btn">← На главную</a>
+        <div class="page-title">ПРИМЕРЫ <span>РАБОТ</span></div>
+    </div>
+
+    <div class="main-container">
+        <div class="panel">
+            <div class="panel-title">Выполнены на заказ</div>
+            <div class="track-btn left-style" onclick="playSmart('s1', 'Заказ 1', this)">
+                <span>Заказ 1</span> <span class="play-icon">▶</span>
+            </div>
+            <div class="track-btn left-style" onclick="playSmart('s2', 'Заказ 2', this)">
+                <span>Заказ 2</span> <span class="play-icon">▶</span>
+            </div>
+            <div class="track-btn left-style" onclick="playSmart('s3', 'Заказ 3', this)">
+                <span>Заказ 3</span> <span class="play-icon">▶</span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Создано мной</div>
+            <a href="https://music.yandex.ru/artist/25139139" target="_blank" class="ya-btn">
+                <svg class="ya-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.65 14.75L12.9 12.9c-.3-.3-.45-.7-.45-1.1v-4.3c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v3.5l3.15 3.15c.59.59.59 1.55 0 2.14-.59.59-1.55.59-2.14 0z"/>
+                    <path d="M7 10h2v7H7v-7zm4-3h2v10h-2V7z"/> 
+                </svg>
+                <span>Слушайте на Yandex музыке</span>
+            </a>
+            <div class="track-btn right-style" onclick="playSmart('ss1', 'In The End (REMIX)', this)">
+                <span>In The End (REMIX)</span> <span class="play-icon">▶</span>
+            </div>
+            <div class="track-btn right-style" onclick="playSmart('ss2', 'Ты соль на рану (REMIX)', this)">
+                <span>Ты соль на рану (REMIX)</span> <span class="play-icon">▶</span>
+            </div>
+            <div class="track-btn right-style" onclick="playSmart('ss3', 'Шрамы вместо её имени', this)">
+                <span>Шрамы вместо её имени</span> <span class="play-icon">▶</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="now-playing-container">
+        <div class="now-playing" id="track-name">waiting for input...</div>
+        <div class="loader-box" id="loader">
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <audio id="audio" crossorigin="anonymous"></audio>
+
+    <div class="chat-toggle-btn" onclick="toggleChat()">
+        💬
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="bot-name">ART-HOLIDAYS AI <span class="bot-status"></span></div>
+            <button class="close-chat" onclick="toggleChat()">✕</button>
+        </div>
+        
+        <div class="chat-body" id="chatBody"></div>
+        <div class="typing" id="typingIndicator">AI печатает...</div>
+
+        <div class="chat-controls" id="chatControls">
+            <button class="choice-btn" onclick="userChoice('vk')">Заказать (VK)</button>
+            <button class="choice-btn" onclick="userChoice('tg')">Лично Роману (TG)</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SETUP CANVAS ---
+        const bgCanvas = document.getElementById('canvas-bg');
+        const bgCtx = bgCanvas.getContext('2d');
+        const visCanvas = document.getElementById('canvas-visualizer');
+        const visCtx = visCanvas.getContext('2d');
+
+        function resize() {
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            visCanvas.width = window.innerWidth; visCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize); resize();
+
+        // --- 2. AUDIO SYSTEM ---
+        const audio = document.getElementById('audio');
+        const statusLabel = document.getElementById('track-name');
+        const loader = document.getElementById('loader');
+        
+        let audioContext, analyser, dataArray;
+        let isAudioSetup = false;
+
+        function setupAudioContext() {
+            if (!isAudioSetup) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    const source = audioContext.createMediaElementSource(audio);
+                    source.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                    analyser.fftSize = 256;
+                    dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    isAudioSetup = true;
+                } catch(e) { console.log("AudioContext error", e); }
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        // --- 3. PLAY LOGIC ---
+        function playSmart(fileId, name, btn) {
+            setupAudioContext();
+
+            // Если Пауза
+            if (btn.classList.contains('active') && !audio.paused) {
+                audio.pause();
+                resetUI();
+                statusLabel.innerText = "PAUSED";
+                loader.style.display = 'none'; 
+                return;
+            }
+
+            resetUI();
+            btn.classList.add('active');
+            btn.querySelector('.play-icon').innerText = '❚❚';
+            
+            statusLabel.style.opacity = '1';
+            statusLabel.innerText = "ЗАГРУЗКА ТРЕКА...";
+            loader.style.display = 'block'; 
+
+            const mp3 = fileId + '.mp3';
+            const wav = fileId + '.wav';
+
+            audio.src = mp3;
+            
+            audio.onerror = () => {
+                console.log("MP3 failed, switching to WAV");
+                statusLabel.innerText = "SEARCHING WAV FORMAT...";
+                audio.src = wav;
+                audio.play();
+                audio.onerror = null;
+            };
+
+            audio.onplay = () => {
+                statusLabel.innerText = "СЕЙЧАС ИГРАЕТ: " + name;
+                loader.style.display = 'none'; 
+            };
+
+            audio.play().catch(e => { 
+                console.error(e); 
+                loader.style.display = 'none'; 
+                if(e.name === 'NotSupportedError' || e.message.includes('CORS')) {
+                   statusLabel.innerHTML = "<span style='color:red'>UPLOAD TO GITHUB TO PLAY</span>";
+                }
+            });
+        }
+
+        function resetUI() {
+            document.querySelectorAll('.track-btn').forEach(b => {
+                b.classList.remove('active');
+                b.querySelector('.play-icon').innerText = '▶';
+            });
+            loader.style.display = 'none';
+        }
+
+        // --- 4. PARTICLES ---
+        let particles = [];
+        class Particle {
+            constructor() {
+                this.x = Math.random() * bgCanvas.width;
+                this.y = Math.random() * bgCanvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.dx = (Math.random() - 0.5) * 4;
+                this.dy = (Math.random() - 0.5) * 4;
+            }
+            update(isActive) {
+                if (isActive) {
+                    this.x += this.dx; this.y += this.dy;
+                    if(this.x < 0 || this.x > bgCanvas.width) this.dx *= -1;
+                    if(this.y < 0 || this.y > bgCanvas.height) this.dy *= -1;
+                }
+            }
+            draw() {
+                bgCtx.fillStyle = '#39ff14'; bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.size, 0, Math.PI*2); bgCtx.fill();
+            }
+        }
+        for(let i=0; i<60; i++) particles.push(new Particle());
+
+        // --- 5. RENDER LOOP ---
+        function render() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
+
+            const isPlaying = !audio.paused && !audio.ended && audio.currentTime > 0;
+            
+            particles.forEach(p => { p.update(isPlaying); p.draw(); });
+
+            if (isAudioSetup && isPlaying) analyser.getByteFrequencyData(dataArray);
+            else if(dataArray) dataArray.fill(0);
+
+            const cx = visCanvas.width / 2;
+            const cy = visCanvas.height / 2;
+            visCtx.fillStyle = '#000'; visCtx.strokeStyle = '#39ff14'; visCtx.lineWidth = 3;
+            visCtx.beginPath();
+            
+            const bars = 100;
+            for (let i = 0; i <= bars; i++) {
+                const angle = (Math.PI * 2 * i) / bars;
+                let freq = 0;
+                if(dataArray) {
+                    const idx = Math.floor((i/bars) * (dataArray.length * 0.7));
+                    freq = dataArray[idx] || 0;
+                }
+                const r = 150 + (freq / 255 * 60) + ((!isPlaying) ? Math.sin(Date.now()/500)*10 : 0);
+                const x = cx + Math.cos(angle) * r;
+                const y = cy + Math.sin(angle) * r;
+                if(i===0) visCtx.moveTo(x,y); else visCtx.lineTo(x,y);
+            }
+            visCtx.closePath(); visCtx.fill(); visCtx.stroke();
+            visCtx.beginPath(); visCtx.fillStyle = 'rgba(255,255,255,0.15)';
+            visCtx.arc(cx - 50, cy - 50, 30, 0, Math.PI*2); visCtx.fill();
+
+            requestAnimationFrame(render);
+        }
+        render();
+
+        // =========================================
+        // 🤖 СКРИПТ ЧАТ-БОТА (МУЗЫКА)
+        // =========================================
+        
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const typing = document.getElementById('typingIndicator');
+        const controls = document.getElementById('chatControls');
+        let isChatInitiated = false;
+
+        function toggleChat() {
+            if (chatWindow.style.display === 'flex') {
+                chatWindow.style.display = 'none';
+            } else {
+                chatWindow.style.display = 'flex';
+                if (!isChatInitiated) {
+                    initBot();
+                    isChatInitiated = true;
+                }
+            }
+        }
+
+        // Сценарий для музыки
+        function initBot() {
+            addBotMessage("Загрузка музыкальных протоколов...");
+            
+            setTimeout(() => {
+                showTyping(true);
+                setTimeout(() => {
+                    showTyping(false);
+                    addBotMessage("Привет! Нужен эксклюзивный бит, сведение или трек под ключ?");
+                }, 1000);
+
+                setTimeout(() => {
+                    showTyping(true);
+                    setTimeout(() => {
+                        showTyping(false);
+                        addBotMessage("Я передам твой запрос Роману лично. Выбери канал связи: 👇");
+                        controls.style.display = 'flex';
+                    }, 2500);
+                }, 1200);
+            }, 800);
+        }
+
+        function userChoice(type) {
+            controls.style.display = 'none';
+
+            if (type === 'vk') {
+                addUserMessage("Группа VK");
+                showTyping(true);
+                setTimeout(() => {
+                    showTyping(false);
+                    addBotMessage("Открываю группу VK для обсуждения заказа... 🎧");
+                    setTimeout(() => {
+                        window.open("https://vk.com/artholidays_ai", "_blank");
+                    }, 2000);
+                }, 1000);
+            } 
+            else if (type === 'tg') {
+                addUserMessage("Лично Роману (TG)");
+                showTyping(true);
+                setTimeout(() => {
+                    showTyping(false);
+                    addBotMessage("Соединяю с Романом в Telegram... 🎹");
+                    setTimeout(() => {
+                        window.open("https://t.me/RomanArtHolidays", "_blank");
+                    }, 2000);
+                }, 1000);
+            }
+            
+            setTimeout(() => { controls.style.display = 'flex'; }, 5000);
+        }
+
+        function addBotMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'msg msg-bot';
+            div.innerText = text;
+            chatBody.appendChild(div);
+            scrollToBottom();
+        }
+
+        function addUserMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'msg msg-user';
+            div.innerText = text;
+            chatBody.appendChild(div);
+            scrollToBottom();
+        }
+
+        function showTyping(show) {
+            typing.style.display = show ? 'block' : 'none';
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roman Art-Holidays | Official Site</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Manrope:wght@300;600&display=swap');
+
+        body {
+            margin: 0; padding: 0;
+            background: #000; color: #fff;
+            font-family: 'Manrope', sans-serif;
+            height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+
+        /* --- ВИДЕО ФОН --- */
+        .video-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: -1;
+            filter: brightness(0.4); /* Затемнение, чтобы текст читался */
+        }
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.05; pointer-events: none; z-index: -1;
+        }
+
+        /* --- ЛОГОТИП --- */
+        .logo-container {
+            text-align: center; margin-bottom: 60px;
+            animation: fadeInDown 1s ease;
+        }
+        .main-title {
+            font-family: 'Oswald', sans-serif; font-size: 4rem;
+            text-transform: uppercase; letter-spacing: 5px;
+            margin: 0; text-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+        }
+        .subtitle {
+            font-size: 1rem; color: #aaa; letter-spacing: 4px; text-transform: uppercase;
+            margin-top: 10px;
+        }
+        .highlight { color: #39ff14; }
+
+        /* --- НАВИГАЦИЯ (СТЕКЛЯННЫЕ БЛОКИ) --- */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+            gap: 30px;
+            width: 80%; max-width: 1200px;
+            animation: fadeInUp 1s ease 0.3s forwards; opacity: 0;
+        }
+
+        .nav-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-10px);
+            background: rgba(57, 255, 20, 0.05);
+            border-color: #39ff14;
+            box-shadow: 0 10px 40px rgba(57, 255, 20, 0.15);
+        }
+
+        .card-icon { font-size: 2.5rem; margin-bottom: 20px; color: #ccc; transition: 0.3s; }
+        .nav-card:hover .card-icon { color: #39ff14; transform: scale(1.1); }
+
+        .card-title {
+            font-family: 'Oswald', sans-serif; font-size: 1.5rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .card-desc { font-size: 0.9rem; color: #888; }
+
+        /* --- ФУТЕР --- */
+        .footer {
+            position: absolute; bottom: 30px; width: 100%;
+            text-align: center; color: #555; font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* АНИМАЦИИ */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <video class="video-bg" autoplay muted loop playsinline>
+        <source src="bg.mp4" type="video/mp4">
+    </video>
+    <div class="noise-overlay"></div>
+
+    <div class="logo-container">
+        <h1 class="main-title">ART <span class="highlight">HOLIDAYS</span></h1>
+        <div class="subtitle">Roman AI Creator & Visual Artist</div>
+    </div>
+
+    <div class="nav-grid">
+        
+        <a href="videos.html" class="nav-card">
+            <div class="card-icon">🎬</div>
+            <div class="card-title">Production</div>
+            <div class="card-desc">Реклама, Клипы, Шоурилы</div>
+        </a>
+
+        <a href="music.html" class="nav-card">
+            <div class="card-icon">🎧</div>
+            <div class="card-title">Music Lab</div>
+            <div class="card-desc">Электронная музыка и саунд-дизайн</div>
+        </a>
+
+        <a href="photos.html" class="nav-card">
+            <div class="card-icon">📸</div>
+            <div class="card-title">Neuro Art</div>
+            <div class="card-desc">Галерея AI генераций</div>
+        </a>
+
+    </div>
+
+    <div class="footer">EST. 2024 • DESIGNED BY ROMAN AI</div>
+
+    <script>
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Если зашли с телефона - сразу кидаем на mobile.html
+            // Но даем кнопку "Вернуться", если вдруг нужно
+            // Для начала просто перенаправим:
+            // window.location.href = "mobile.html"; 
+            
+            // ЛИБО (Лучший вариант) - показываем заглушку как раньше
+            const mobileAlert = document.createElement('div');
+            mobileAlert.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;";
+            mobileAlert.innerHTML = `
+                <h2 style="color:#39ff14;font-family:sans-serif;">MOBILE DETECTED</h2>
+                <a href="mobile.html" style="background:#39ff14;color:#000;text-decoration:none;padding:15px 30px;border-radius:30px;font-weight:bold;font-family:sans-serif;margin-top:20px;">GO TO MOBILE VERSION</a>
+            `;
+            document.body.appendChild(mobileAlert);
+        }
+    </script>
+
+</body>
+</html>

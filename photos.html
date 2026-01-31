@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roman AI | Neuro Gallery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Manrope:wght@300;600&display=swap');
+
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Manrope', sans-serif;
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- ФОНОВЫЕ ЧАСТИЦЫ --- */
+        #canvas1 {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+        }
+
+        /* --- НАВИГАЦИЯ --- */
+        .nav-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            position: sticky; top: 0; z-index: 100;
+            width: 100%; box-sizing: border-box;
+        }
+
+        .back-btn {
+            text-decoration: none; color: #888; 
+            display: inline-flex; align-items: center; gap: 10px; 
+            font-weight: bold; transition: 0.3s; 
+            text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px;
+        }
+        .back-btn:hover { color: #39ff14; padding-left: 10px; text-shadow: 0 0 10px rgba(57,255,20,0.5); }
+
+        .page-title {
+            font-family: 'Oswald', sans-serif; font-size: 1.5rem; 
+            color: #fff; text-transform: uppercase; letter-spacing: 3px; margin: 0;
+        }
+        .page-title span { color: #39ff14; }
+
+        /* --- СЕТКА (GRID) --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 40px; padding: 40px;
+            position: relative; z-index: 10;
+        }
+
+        /* --- КАРТОЧКА --- */
+        .art-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 15px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer; display: flex; flex-direction: column; gap: 15px;
+        }
+        .art-card:hover {
+            transform: translateY(-10px); border-color: #39ff14;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 20px rgba(57, 255, 20, 0.1);
+            background: rgba(20, 20, 20, 0.8);
+        }
+        .img-wrapper {
+            width: 100%; height: 400px; border-radius: 8px;
+            overflow: hidden; position: relative;
+        }
+        .img-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease;
+        }
+        .art-card:hover .img-wrapper img { transform: scale(1.05); }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; }
+        .art-tag {
+            background: #39ff14; color: #000; font-family: 'Oswald', sans-serif;
+            font-weight: bold; font-size: 0.8rem; padding: 5px 12px;
+            border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+        .art-id { color: #555; font-size: 0.8rem; font-family: monospace; }
+        .art-card:hover .art-id { color: #888; }
+
+        /* --- ЛАЙТБОКС --- */
+        .lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 9999;
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(10px);
+        }
+        .lightbox.active { display: flex; opacity: 1; }
+        .lightbox img {
+            max-width: 90%; max-height: 90%;
+            border: 2px solid #39ff14;
+            box-shadow: 0 0 50px rgba(57, 255, 20, 0.2);
+            border-radius: 8px;
+        }
+        .close-lb {
+            position: absolute; top: 30px; right: 30px;
+            color: #fff; font-size: 2rem; cursor: pointer; transition: 0.3s;
+        }
+        .close-lb:hover { color: #39ff14; transform: scale(1.2); }
+
+        /* =========================================
+           🤖 AI CHAT BOT STYLES
+           ========================================= */
+        
+        /* Кнопка открытия */
+        .chat-toggle-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px;
+            background: #000;
+            border: 2px solid #39ff14;
+            border-radius: 50%;
+            color: #39ff14; font-size: 30px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 200;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+            transition: 0.3s;
+            animation: pulse-chat 2s infinite;
+        }
+        .chat-toggle-btn:hover { transform: scale(1.1); background: #39ff14; color: #000; }
+        @keyframes pulse-chat { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(57, 255, 20, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); } }
+
+        /* Окно чата */
+        .chat-window {
+            position: fixed; bottom: 100px; right: 30px;
+            width: 350px; height: 450px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid #39ff14;
+            border-radius: 20px;
+            display: none; flex-direction: column;
+            overflow: hidden; z-index: 200;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+            transform-origin: bottom right;
+            animation: openChat 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes openChat { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Шапка чата */
+        .chat-header {
+            background: linear-gradient(90deg, #111, #000);
+            padding: 15px; border-bottom: 1px solid #333;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .bot-name { font-family: 'Oswald', sans-serif; color: #fff; font-size: 1.1rem; letter-spacing: 1px; }
+        .bot-status { width: 8px; height: 8px; background: #39ff14; border-radius: 50%; box-shadow: 0 0 5px #39ff14; margin-left: 10px; display: inline-block; }
+        .close-chat { background: none; border: none; color: #666; font-size: 1.2rem; cursor: pointer; }
+        .close-chat:hover { color: #fff; }
+
+        /* Тело чата */
+        .chat-body {
+            flex: 1; padding: 20px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        /* Скроллбар чата */
+        .chat-body::-webkit-scrollbar { width: 5px; }
+        .chat-body::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        /* Сообщения */
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg-bot { background: #222; color: #fff; border-bottom-left-radius: 2px; border: 1px solid #333; }
+        .msg-user { background: #39ff14; color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 600; }
+        
+        .typing { font-style: italic; color: #666; font-size: 0.8rem; margin-left: 10px; display: none; }
+
+        /* Кнопки выбора */
+        .chat-controls {
+            padding: 15px; border-top: 1px solid #333;
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .choice-btn {
+            flex: 1;
+            background: transparent; border: 1px solid #39ff14;
+            color: #39ff14; padding: 10px; border-radius: 8px;
+            cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: bold;
+            font-size: 0.8rem; transition: 0.2s;
+        }
+        .choice-btn:hover { background: #39ff14; color: #000; }
+
+        /* Адаптив чата для мобилок */
+        @media (max-width: 500px) {
+            .chat-window { width: 90%; right: 5%; bottom: 100px; height: 400px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas1"></canvas>
+
+    <div class="nav-bar">
+        <a href="index.html" class="back-btn">← На главную</a>
+        <div class="page-title">НЕЙРО <span>КОЛЛЕКЦИЯ</span></div>
+    </div>
+
+    <div class="gallery-grid" id="grid"></div>
+
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="close-lb">&times;</span>
+        <img id="lb-img" src="">
+    </div>
+
+    <div class="chat-toggle-btn" onclick="toggleChat()">
+        💬
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="bot-name">ART-HOLIDAYS AI <span class="bot-status"></span></div>
+            <button class="close-chat" onclick="toggleChat()">✕</button>
+        </div>
+        
+        <div class="chat-body" id="chatBody">
+            </div>
+        <div class="typing" id="typingIndicator">AI печатает...</div>
+
+        <div class="chat-controls" id="chatControls">
+            <button class="choice-btn" onclick="userChoice('vk')">Группа VK</button>
+            <button class="choice-btn" onclick="userChoice('tg')">Лично Роману (TG)</button>
+        </div>
+    </div>
+
+    <script>
+        // --- СКРИПТ ЧАСТИЦ ---
+        const canvas = document.getElementById('canvas1');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particlesArray;
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 0.5 - 0.25; this.speedY = Math.random() * 0.5 - 0.25;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0; else if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0; else if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(57, 255, 20, 0.4)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+        function init() { particlesArray = []; let n = (canvas.height * canvas.width) / 15000; for (let i = 0; i < n; i++) particlesArray.push(new Particle()); }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particlesArray.forEach(p => {p.update(); p.draw();}); requestAnimationFrame(animate); }
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; init(); });
+        init(); animate();
+
+        // --- СКРИПТ ГАЛЕРЕИ ---
+        const grid = document.getElementById('grid');
+        const tags = ["КИБЕРПАНК", "НЕОН", "АБСТРАКЦИЯ", "SCI-FI", "ПОРТРЕТ", "DARK ART", "ГЛИТЧ"];
+        for (let i = 1; i <= 20; i++) {
+            const tag = tags[Math.floor(Math.random() * tags.length)];
+            const placeholder = `https://placehold.co/600x800/111/39ff14?text=ART+${i}&font=oswald`;
+            grid.innerHTML += `
+                <div class="art-card" onclick="openLightbox('p${i}.jpg', '${placeholder}')">
+                    <div class="img-wrapper"><img src="p${i}.jpg" onerror="this.src='${placeholder}'" alt="Art ${i}"></div>
+                    <div class="card-footer"><div class="art-tag">${tag}</div><div class="art-id">#00${i}</div></div>
+                </div>`;
+        }
+
+        const lightbox = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lb-img');
+        function openLightbox(src, backup) { lightbox.classList.add('active'); lbImg.src = src; lbImg.onerror = function() { this.src = backup; }; }
+        function closeLightbox() { lightbox.classList.remove('active'); setTimeout(() => { lbImg.src = ''; }, 300); }
+        document.addEventListener('keydown', (e) => { if(e.key === "Escape") closeLightbox(); });
+
+        // =========================================
+        // 🤖 СКРИПТ ЧАТ-БОТА
+        // =========================================
+        
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const typing = document.getElementById('typingIndicator');
+        const controls = document.getElementById('chatControls');
+        let isChatInitiated = false;
+
+        function toggleChat() {
+            if (chatWindow.style.display === 'flex') {
+                chatWindow.style.display = 'none';
+            } else {
+                chatWindow.style.display = 'flex';
+                if (!isChatInitiated) {
+                    initBot();
+                    isChatInitiated = true;
+                }
+            }
+        }
+
+        // Запуск сценария приветствия
+        function initBot() {
+            addBotMessage("Инициализация систем...");
+            
+            setTimeout(() => {
+                showTyping(true);
+                setTimeout(() => {
+                    showTyping(false);
+                    addBotMessage("Привет! Хочешь уникальную нейрофотосессию?");
+                }, 1000);
+
+                setTimeout(() => {
+                    showTyping(true);
+                    setTimeout(() => {
+                        showTyping(false);
+                        addBotMessage("Я помогу тебе связаться с создателем. Выбери удобный способ связи ниже: 👇");
+                        controls.style.display = 'flex'; // Показываем кнопки
+                    }, 2500);
+                }, 1200);
+            }, 800);
+        }
+
+        function userChoice(type) {
+            // Скрываем кнопки, чтобы не нажал дважды
+            controls.style.display = 'none';
+
+            if (type === 'vk') {
+                addUserMessage("Группа VK");
+                showTyping(true);
+                setTimeout(() => {
+                    showTyping(false);
+                    addBotMessage("Отличный выбор! Перевожу тебя в нашу группу VK... 🚀");
+                    setTimeout(() => {
+                        window.open("https://vk.com/artholidays_ai", "_blank");
+                    }, 2000);
+                }, 1000);
+            } 
+            else if (type === 'tg') {
+                addUserMessage("Лично Роману (Telegram)");
+                showTyping(true);
+                setTimeout(() => {
+                    showTyping(false);
+                    addBotMessage("Понял. Перевожу на защищённый канал связи с Романом... 🔒");
+                    setTimeout(() => {
+                        window.open("https://t.me/RomanArtHolidays", "_blank");
+                    }, 2000);
+                }, 1000);
+            }
+            
+            // Возвращаем кнопки через 5 сек (на всякий случай)
+            setTimeout(() => { controls.style.display = 'flex'; }, 5000);
+        }
+
+        // Вспомогательные функции
+        function addBotMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'msg msg-bot';
+            div.innerText = text;
+            chatBody.appendChild(div);
+            scrollToBottom();
+        }
+
+        function addUserMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'msg msg-user';
+            div.innerText = text;
+            chatBody.appendChild(div);
+            scrollToBottom();
+        }
+
+        function showTyping(show) {
+            typing.style.display = show ? 'block' : 'none';
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
